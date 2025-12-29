@@ -44,14 +44,31 @@ void execute(List<String> args) {
       allowed: Processor.defaultInstructionSet,
       splitCommas: true,
     )
+    ..addMultiOption(
+      'no-processors',
+      help:
+          'Exclude specific processors from execution. Supports glob patterns (e.g., "*:icons", "flutter:*")',
+      splitCommas: true,
+    )
     ..addFlag('verbose', abbr: 'v');
 
   final results = argParser.parse(args);
   final force = results['force'] as bool? ?? false;
   final argProcessors = results['processors'];
+  final argNoProcessors = results['no-processors'];
   final level = results['verbose'] == true ? Level.verbose : Level.info;
 
   final logger = Logger(level: level);
+
+  // Validate that --processors and --no-processors are not used together
+  if (argProcessors.isNotEmpty && argNoProcessors.isNotEmpty) {
+    logger.err(
+      'Error: Cannot use both --processors and --no-processors together.\n'
+      'Use --processors to specify which processors to run (whitelist), '
+      'OR use --no-processors to exclude specific processors (blacklist).',
+    );
+    exit(64);
+  }
 
   const parser = Parser(
     pubspecPath: 'pubspec',
@@ -66,8 +83,27 @@ void execute(List<String> args) {
     exit(65);
   }
 
+  // Validate that instructions and excludeInstructions are not both present in config
+  if (flavorizr.instructions != null &&
+      flavorizr.instructions!.isNotEmpty &&
+      flavorizr.excludeInstructions != null &&
+      flavorizr.excludeInstructions!.isNotEmpty) {
+    logger.err(
+      'Error: Cannot use both "instructions" and "excludeInstructions" in configuration.\n'
+      'Use "instructions" to specify which processors to run (whitelist), '
+      'OR use "excludeInstructions" to exclude specific processors (blacklist).',
+    );
+    exit(65);
+  }
+
   if (argProcessors.isNotEmpty) {
     flavorizr.instructions = argProcessors;
+  }
+
+  if (argNoProcessors.isNotEmpty) {
+    // Merge CLI excludeInstructions with config file excludeInstructions
+    final existingExclusions = flavorizr.excludeInstructions ?? [];
+    flavorizr.excludeInstructions = [...existingExclusions, ...argNoProcessors];
   }
 
   final processor = Processor(

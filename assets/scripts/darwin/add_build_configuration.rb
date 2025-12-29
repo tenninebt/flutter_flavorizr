@@ -24,6 +24,7 @@ target_config = native_target.add_build_configuration(config_name, config_mode)
 target_config.base_configuration_reference = file_ref
 target_config.build_settings = {
   'PRODUCT_NAME' => '$(TARGET_NAME)',
+  'PRODUCT_BUNDLE_IDENTIFIER' => '$(PRODUCT_BUNDLE_IDENTIFIER)',
 }
 
 # Build configuration list for PBXProject "Runner"

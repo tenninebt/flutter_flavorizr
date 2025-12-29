@@ -35,7 +35,7 @@ This package is intended to support development of Flutter projects. In general,
 
 ```yaml
 dev_dependencies:
-  flutter_flavorizr: ^2.4.1
+  flutter_flavorizr: ^2.5.0
 ```
 
 You can install packages from the command line:
@@ -105,6 +105,22 @@ flavorizr:
         bundleId: "com.example.banana"
 ```
 
+You can also exclude specific processors without listing all the ones you want (useful for skipping icons, dummy assets, etc.):
+
+```yaml
+flavorizr:
+  flavors:
+    # ... your flavors here ...
+  
+  excludeInstructions:
+    - "flutter:main"      # Skip main.dart generation
+    - "flutter:flavors"   # Skip flavors.dart generation
+    - "*:icons"           # Skip all icon processors
+    - "*:dummyAssets"     # Skip all dummy assets
+```
+
+**Note:** You cannot use both `instructions` and `excludeInstructions` in the same configuration. Choose one approach: whitelist (instructions) or blacklist (excludeInstructions).
+
 ### Available fields
 
 #### flavorizr
@@ -113,8 +129,9 @@ flavorizr:
 |:----------------------------------------|:-------|:------------------------------------------------------------------------------------|:---------|:----------------------------------------------------------------------------------------------|
 | app                                     | Object |                                                                                     | false    | An object describing the general capabilities of an app                                       |
 | flavors                                 | Array  |                                                                                     | true     | An array of items. Each of them describes a flavor configuration                              |
-| [instructions](#available-instructions) | Array  |                                                                                     | false    | An array of instructions to customize the flavorizr process                                   |
-| assetsUrl                               | String | [link](https://github.com/AngeloAvv/flutter_flavorizr/releases/download/v2.4.1/assets.zip) | false    | A string containing the URL of the zip assets file. The default points to the current release |
+| [instructions](#available-instructions) | Array  |                                                                                     | false    | An array of instructions to customize the flavorizr process (whitelist approach)              |
+| excludeInstructions                     | Array  |                                                                                     | false    | An array of instructions to exclude from execution. Supports glob patterns like `*:icons` or `flutter:*` (blacklist approach). Cannot be used with `instructions` |
+| assetsUrl                               | String | [link](https://github.com/tenninebt/flutter_flavorizr/releases/download/v2.5.0/assets.zip) | false    | A string containing the URL of the zip assets file. The default points to the current release |
 | ide                                     | String |                                                                                     | false    | The IDE in which the app is being developed. Currently only `vscode` or `idea`                |
 
 ##### <a href="#available-instructions">Available instructions</a>
@@ -383,6 +400,16 @@ Example
 flutter pub run flutter_flavorizr -p assets:download
 flutter pub run flutter_flavorizr -p assets:download,assets:extract
 ```
+
+You can also exclude processors using --no-processors (useful for skipping specific processors without listing all others):
+
+```terminal
+flutter pub run flutter_flavorizr --no-processors=flutter:main,flutter:flavors
+flutter pub run flutter_flavorizr --no-processors="*:icons"  # Exclude all icon processors
+flutter pub run flutter_flavorizr --no-processors="flutter:*"  # Exclude all flutter processors
+```
+
+**Note:** You cannot use both --processors and --no-processors together. Choose one approach: whitelist (--processors) or blacklist (--no-processors).
 
 Keep in mind that the order of the processors is important. For example, if you want to run the assets:extract processor, you must run it after the assets:download processor.
 Also, some processors need assets to be downloaded before running. For example, the android:dummyAssets processor needs the assets:download processor to be run before.

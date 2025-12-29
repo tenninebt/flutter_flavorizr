@@ -4,3 +4,4 @@
 ASSET_PREFIX=banana
 BUNDLE_NAME=Banana App
 BUNDLE_DISPLAY_NAME=Banana App
+PRODUCT_BUNDLE_IDENTIFIER=com.example.banana

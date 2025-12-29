@@ -1,4 +1,10 @@
-## NEXT
+## 2.5.0
+
+* **NEW:** Added `excludeInstructions` to exclude processors from execution with glob pattern support (e.g., `*:icons`, `flutter:*`)
+* **NEW:** Added `--no-processors` CLI argument for excluding processors (e.g., `--no-processors="flutter:*,*:icons"`)
+* **IMPROVED:** iOS/macOS xcconfig files now define `PRODUCT_BUNDLE_IDENTIFIER` as a variable (follows Apple best practices)
+* **IMPROVED:** iOS/macOS scheme generation now preserves custom attributes (e.g., `customLLDBInitFile`)
+* **IMPROVED:** Added validation to prevent mixing whitelist (`instructions`/`--processors`) and blacklist (`excludeInstructions`/`--no-processors`) approaches
 
 ## 2.4.1
 * Fixed profile build configuration

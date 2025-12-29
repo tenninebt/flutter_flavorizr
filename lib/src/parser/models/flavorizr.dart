@@ -43,9 +43,12 @@ class Flavorizr {
   @JsonKey()
   List<String>? instructions;
 
+  @JsonKey()
+  List<String>? excludeInstructions;
+
   @JsonKey(
     defaultValue:
-        'https://github.com/AngeloAvv/flutter_flavorizr/releases/download/v2.4.1/assets.zip',
+        'https://github.com/tenninebt/flutter_flavorizr/releases/download/v2.5.0/assets.zip',
   )
   final String assetsUrl;
 
@@ -77,6 +80,7 @@ class Flavorizr {
     this.app,
     required this.flavors,
     this.instructions,
+    this.excludeInstructions,
     required this.assetsUrl,
     this.ide,
   })  : androidFlavors = flavors.where((_, flavor) => flavor.android != null),

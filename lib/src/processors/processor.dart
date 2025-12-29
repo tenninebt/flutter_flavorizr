@@ -135,6 +135,46 @@ class Processor extends AbstractProcessor<void> {
       ..removeWhere((instruction) =>
           !config.macosFlavorsAvailable && instruction.startsWith('macos'));
 
+    // Apply exclusion patterns
+    if (config.excludeInstructions != null &&
+        config.excludeInstructions!.isNotEmpty) {
+      final excludedInstructions = <String>[];
+      final unmatchedPatterns = <String>[];
+
+      for (String pattern in config.excludeInstructions!) {
+        bool matched = false;
+        for (String instruction in List.from(instructions)) {
+          if (matchesPattern(instruction, pattern)) {
+            if (!excludedInstructions.contains(instruction)) {
+              excludedInstructions.add(instruction);
+            }
+            matched = true;
+          }
+        }
+        if (!matched) {
+          unmatchedPatterns.add(pattern);
+        }
+      }
+
+      // Remove excluded instructions
+      instructions.removeWhere(
+          (instruction) => excludedInstructions.contains(instruction));
+
+      // Warn about unmatched patterns
+      for (String pattern in unmatchedPatterns) {
+        logger
+            .warn('Exclusion pattern "$pattern" did not match any processors');
+      }
+
+      // Log excluded processors
+      if (excludedInstructions.isNotEmpty) {
+        logger.info('The following processors were excluded:');
+        for (String excluded in excludedInstructions) {
+          logger.info(' - $excluded');
+        }
+      }
+    }
+
     logger.info('Flavorization process started');
 
     if (!force) {
@@ -444,5 +484,48 @@ class Processor extends AbstractProcessor<void> {
             logger: logger,
           ),
     };
+  }
+
+  /// Checks if an instruction matches an exclusion pattern.
+  /// Supports glob patterns:
+  /// - `*:icons` matches any processor ending with `:icons` (e.g., android:icons, ios:icons)
+  /// - `flutter:*` matches any processor starting with `flutter:` (e.g., flutter:flavors, flutter:main)
+  /// - `android:dummyAssets` exact match
+  ///
+  /// This method is public for testing purposes.
+  static bool matchesPattern(String instruction, String pattern) {
+    // Exact match
+    if (instruction == pattern) {
+      return true;
+    }
+
+    // Glob pattern matching
+    if (pattern.contains('*')) {
+      // Convert glob pattern to regex
+      // Escape special regex characters except *
+      String regexPattern = pattern
+          .replaceAll(r'\', r'\\')
+          .replaceAll('.', r'\.')
+          .replaceAll('+', r'\+')
+          .replaceAll('?', r'\?')
+          .replaceAll('^', r'\^')
+          .replaceAll(r'$', r'\$')
+          .replaceAll('(', r'\(')
+          .replaceAll(')', r'\)')
+          .replaceAll('[', r'\[')
+          .replaceAll(']', r'\]')
+          .replaceAll('{', r'\{')
+          .replaceAll('}', r'\}')
+          .replaceAll('|', r'\|');
+
+      // Replace * with .*
+      regexPattern = regexPattern.replaceAll('*', '.*');
+
+      // Create regex with anchors
+      final regex = RegExp('^$regexPattern\$');
+      return regex.hasMatch(instruction);
+    }
+
+    return false;
   }
 }

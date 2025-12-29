@@ -75,6 +75,7 @@ class MacOSConfigsProcessor extends StringProcessor {
       'ASSET_PREFIX': Variable(value: _flavorName),
       'BUNDLE_NAME': Variable(value: _flavor.app.name),
       'BUNDLE_DISPLAY_NAME': Variable(value: _flavor.app.name),
+      'PRODUCT_BUNDLE_IDENTIFIER': Variable(value: _flavor.macos!.bundleId),
     })
       ..addAll(
         _flavor.macos?.variables.where((_, variable) =>

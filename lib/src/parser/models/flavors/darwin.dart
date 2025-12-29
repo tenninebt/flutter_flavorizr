@@ -47,8 +47,10 @@ class Darwin extends OS with BuildSettingsMixin {
     super.firebase,
     super.icon,
   }) {
+    // PRODUCT_BUNDLE_IDENTIFIER is now defined in xcconfig files, not buildSettings
+    // This allows for better configuration hierarchy and per-developer overrides
     this.buildSettings = {
-      "PRODUCT_BUNDLE_IDENTIFIER": bundleId,
+      "PRODUCT_BUNDLE_IDENTIFIER": "\$(PRODUCT_BUNDLE_IDENTIFIER)",
     };
     this.buildSettings.addAll(buildSettings);
   }
