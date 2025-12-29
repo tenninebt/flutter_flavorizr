@@ -5,6 +5,7 @@
 * **IMPROVED:** iOS/macOS xcconfig files now define `PRODUCT_BUNDLE_IDENTIFIER` as a variable (follows Apple best practices)
 * **IMPROVED:** iOS/macOS scheme generation now preserves custom attributes (e.g., `customLLDBInitFile`)
 * **IMPROVED:** Added validation to prevent mixing whitelist (`instructions`/`--processors`) and blacklist (`excludeInstructions`/`--no-processors`) approaches
+* **CHANGED:** `ASSETCATALOG_COMPILER_APPICON_NAME` is now dynamic: set to `$(ASSET_PREFIX)AppIcon` when an icon is defined in the flavor config, or `AppIcon` (default) when no icon is defined. This allows using `flutter_launcher_icons` or other icon tools by simply not defining an `icon` field
 
 ## 2.4.1
 * Fixed profile build configuration

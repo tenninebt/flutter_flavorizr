@@ -49,11 +49,7 @@ class IOSBuildConfigurationsTargetsProcessor extends QueueProcessor {
                         project,
                         file,
                         flavorName,
-                        {}
-                          ..addAll(config.app?.ios != null
-                              ? config.app!.ios!.buildSettings
-                              : BuildSettingsMixin.iosDefaultBuildSettings)
-                          ..addAll(flavor.ios!.buildSettings),
+                        _buildSettings(config, flavor),
                         config: config,
                         logger: logger,
                       ),
@@ -61,6 +57,23 @@ class IOSBuildConfigurationsTargetsProcessor extends QueueProcessor {
                 .values,
           ],
         );
+
+  static Map<String, dynamic> _buildSettings(config, Flavor flavor) {
+    final settings = <String, dynamic>{}
+      ..addAll(config.app?.ios != null
+          ? config.app!.ios!.buildSettings
+          : BuildSettingsMixin.iosDefaultBuildSettings)
+      ..addAll(flavor.ios!.buildSettings);
+
+    // Set ASSETCATALOG_COMPILER_APPICON_NAME based on whether an icon is defined
+    // - With icon: use $(ASSET_PREFIX)AppIcon for flavor-specific icons
+    // - Without icon: use default "AppIcon" (for flutter_launcher_icons compatibility)
+    final hasIcon = flavor.app.icon != null || flavor.ios?.icon != null;
+    settings['ASSETCATALOG_COMPILER_APPICON_NAME'] =
+        hasIcon ? '\$(ASSET_PREFIX)AppIcon' : 'AppIcon';
+
+    return settings;
+  }
 
   @override
   String toString() => 'IOSBuildConfigurationsTargetsProcessor';

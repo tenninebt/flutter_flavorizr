@@ -1,8 +1,12 @@
 import 'package:json_annotation/json_annotation.dart';
 
 mixin BuildSettingsMixin {
+  // Note: ASSETCATALOG_COMPILER_APPICON_NAME is NOT included in default settings.
+  // It is dynamically added in IOSBuildConfigurationsTargetsProcessor and
+  // MacOSBuildConfigurationsTargetsProcessor when an icon is defined for the flavor.
+  // This allows using flutter_launcher_icons or other tools by simply not
+  // defining an icon field in the flavor configuration.
   static final Map<String, dynamic> iosDefaultBuildSettings = {
-    "ASSETCATALOG_COMPILER_APPICON_NAME": "\$(ASSET_PREFIX)AppIcon",
     "LD_RUNPATH_SEARCH_PATHS": "\$(inherited) @executable_path/Frameworks",
     "SWIFT_OBJC_BRIDGING_HEADER": "Runner/Runner-Bridging-Header.h",
     "SWIFT_VERSION": "5.0",
@@ -12,7 +16,6 @@ mixin BuildSettingsMixin {
   };
 
   static final Map<String, dynamic> macosDefaultBuildSettings = {
-    "ASSETCATALOG_COMPILER_APPICON_NAME": "\$(ASSET_PREFIX)AppIcon",
     "LD_RUNPATH_SEARCH_PATHS": "\$(inherited) @executable_path/Frameworks",
     "SWIFT_VERSION": "5.0",
     "FRAMEWORK_SEARCH_PATHS": ['\$(inherited)', '\$(PROJECT_DIR)/Flutter'],
