@@ -20,6 +20,9 @@ on:
 jobs:
   build:
     runs-on: ${{ inputs.platform == 'android' && 'ubuntu-latest' || 'macos-latest' }}
+    env:
+      # Increase JVM heap to avoid OOM during Android release builds
+      GRADLE_OPTS: "-Xmx4g -XX:+HeapDumpOnOutOfMemoryError"
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
